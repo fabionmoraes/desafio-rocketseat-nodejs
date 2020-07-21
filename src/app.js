@@ -15,9 +15,9 @@ app.get("/repositories", (request, response) => {
 });
 
 app.post("/repositories", (request, response) => {
-  const { url, techs } = request.body;
+  const { url, title, techs } = request.body;
 
-  const repositorie = { id: uuid(), url, techs, like: 0 }
+  const repositorie = { id: uuid(), url, title, techs, likes: 0 }
 
   repositories.push(repositorie);
 
@@ -26,7 +26,7 @@ app.post("/repositories", (request, response) => {
 
 app.put("/repositories/:id", (request, response) => {
   const { id } = request.params;
-  const { url, techs } = request.body;
+  const { url, techs, title } = request.body;
 
   const repositorieIndex = repositories.findIndex(item => item.id === id);
 
@@ -34,11 +34,11 @@ app.put("/repositories/:id", (request, response) => {
     return response.status(400).json({ error: 'Repositorie not found' });
   }
 
-  const { like } = repositories.find(item => item.id === id);
+  const { likes } = repositories.find(item => item.id === id);
 
-  const repositorie = { id, url, techs};
+  const repositorie = { id, url, title, techs, likes};
 
-  repositories[repositorieIndex] = { ...repositorie, like };
+  repositories[repositorieIndex] = { ...repositorie, likes };
   
   return response.json(repositorie);
 });
@@ -59,7 +59,6 @@ app.delete("/repositories/:id", (request, response) => {
 
 app.post("/repositories/:id/like", (request, response) => {
   const { id } = request.params;
-  const { like } = request.body;
 
   const repositorieIndex = repositories.findIndex(item => item.id === id);
 
@@ -67,16 +66,15 @@ app.post("/repositories/:id/like", (request, response) => {
     return response.status(400).json({ error: 'Repositorie not found' });
   }
 
-  const repositorieLike = repositories.find(item => item.id === id);
-  const { url, techs } = repositorieLike;
+  const { url, title, techs, likes } = repositories.find(item => item.id === id);
 
-  const count = like + repositorieLike.like;
+  const count = 1 + likes;
 
-  const repositorie = { id, url, techs, like: count };
+  const repositorie = { id, url, title, techs, likes: count };
 
   repositories[repositorieIndex] = repositorie;
   
-  return response.json(count);
+  return response.json({ likes: count });
 });
 
 module.exports = app;
